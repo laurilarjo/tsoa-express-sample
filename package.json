@@ -1,0 +1,39 @@
+{
+  "name": "tsoa-express-sample",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/src/server.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "swagger-ui-express": "^4.1.6",
+    "tsoa": "^3.7.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.0",
+    "@types/express": "^4.17.11",
+    "@types/node": "^15.0.1",
+    "@types/swagger-ui-express": "^4.1.2",
+    "concurrently": "^6.0.2",
+    "ts-node-dev": "^1.1.6",
+    "typescript": "^4.2.4"
+  },
+  "scripts": {
+    "build": "tsoa spec-and-routes && tsc",
+    "dev": "concurrently \"ts-node-dev src/server.ts\" \"tsoa spec-and-routes\"",
+    "ts-node-dev": "ts-node-dev src/server.ts",
+    "start": "node build/src/server.js",
+    "typecheck": "tsc --noemit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laurilarjo/tsoa-express-sample.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/laurilarjo/tsoa-express-sample/issues"
+  },
+  "homepage": "https://github.com/laurilarjo/tsoa-express-sample#readme"
+}
