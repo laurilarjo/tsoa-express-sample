@@ -1,0 +1,71 @@
+trigger:
+  - master
+  - development
+  - hotfix*
+  - release*
+
+pool:
+  vmImage: 'ubuntu-20.04'
+
+jobs:
+  - job: "Test_tsoa"
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '14.x'
+        displayName: 'Install Node.js'
+      - script: |
+          npm ci
+        displayName: 'npm ci'
+        workingDirectory: 'src'
+      - script: |
+            env >> .env
+        displayName: 'Map environment variables to .env'
+        workingDirectory: 'src'
+      - script: |
+          npm run test
+        displayName: 'Run tests'
+        workingDirectory: 'src'
+  - job: "Build_tsoa"
+    dependsOn:
+      - Test_tsoa
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '14.x'
+        displayName: 'Install Node.js'
+      - script: |
+          npm ci
+        displayName: 'npm ci'
+        workingDirectory: 'src'
+      - script: |
+          npm run build
+        displayName: 'npm run build'
+        workingDirectory: 'src'
+      - script: |
+          npm prune --production
+        displayName: 'Remove dev dependencies'
+        workingDirectory: 'src'
+      - task: CopyFiles@2
+        displayName: 'Compose Deployment Package'
+        inputs:
+          sourceFolder: '$(System.DefaultWorkingDirectory)'
+          contents: |
+            **/build/**
+            package.json
+            package-lock.json
+            **/node_modules/**
+          targetFolder: '$(Build.ArtifactStagingDirectory)'
+      - task: ArchiveFiles@2
+        displayName: 'Archive files'
+        inputs:
+          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+          replaceExistingArchive: true
+          includeRootFolder: false
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+          ArtifactName: 'drop'
+        displayName: 'Publish npm artifact'
